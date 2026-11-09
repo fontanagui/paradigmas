@@ -37,10 +37,11 @@ public class Tabuleiro {
         for (int l=1; l<= TAMANHO; l++) {
             for (int c=1;c<=TAMANHO;c++) {
                 Posicao p = new Posicao(l,c);
-                setores[l-1][c-1]= criarSetor(p,p.equals(CENTRO),aleatorio);
+                setores[l-1][c-1]= criaSetor(p,p.equals(CENTRO),aleatorio);
             }
         }
         setFonte(sortearFonte(aleatorio));
+        getSetor(CENTRO).setVisitado(true);
         if(alcancaveis() != TAMANHO*TAMANHO){
             throw new IllegalStateException("setores inalcancaveis");
         }
@@ -70,10 +71,10 @@ public class Tabuleiro {
             return false;
         }
         return switch (d){
-            case DIREITA -> PORTAS_LATERAIS[p.linha() - 1].charAt(p.coluna() - 1) == '1';
-            case ESQUERDA -> PORTAS_LATERAIS[p.linha() - 1].charAt(p.coluna() - 2) == '1';
-            case BAIXO -> PORTAS_VERTICAIS[p.linha() - 1].charAt(p.coluna() - 1) == '1';
-            case CIMA -> PORTAS_VERTICAIS[p.linha() - 2].charAt(p.coluna() - 1) == '1';
+            case DIREITA -> PORTAS_LATERAIS[p.x() - 1].charAt(p.y() - 1) == '1';
+            case ESQUERDA -> PORTAS_LATERAIS[p.x() - 1].charAt(p.y() - 2) == '1';
+            case BAIXO -> PORTAS_VERTICAIS[p.x() - 1].charAt(p.y() - 1) == '1';
+            case CIMA -> PORTAS_VERTICAIS[p.x() - 2].charAt(p.y() - 1) == '1';
         };
     }
     private Posicao sortearFonte(Random aleatorio) {
@@ -101,7 +102,28 @@ public class Tabuleiro {
         }
         return vistos.size();
     }
+
+    private boolean dentro(Posicao p) {
+        return p.x() >= 1 && p.x() <= TAMANHO
+            && p.y() >= 1 && p.y() <= TAMANHO;
     }
-        
-    
+
+    public Setor getSetor(Posicao p) {
+        if (p == null || !dentro(p)) {
+            throw new IllegalArgumentException("A posição deve estar dentro do tabuleiro.");
+        }
+        return setores[p.x() - 1][p.y() - 1];
+    }
+
+    public Posicao getFonte() {
+        return fonte;
+    }
+
+    public void setFonte(Posicao fonte) {
+        if (fonte == null || !dentro(fonte) || fonte.equals(CENTRO)) {
+            throw new IllegalArgumentException("A fonte deve estar dentro do tabuleiro e fora do centro.");
+        }
+        this.fonte = fonte;
+    }
+}
 
