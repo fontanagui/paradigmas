@@ -3,10 +3,10 @@ package tabuleiro;
 
 
 public enum Direcao {
-    CIMA (0, -1, "Cima"),
-    BAIXO (0, 1, "Baixo"),
-    ESQUERDA (-1, 0, "Esquerda"),
-    DIREITA (1, 0, "Direita");
+    CIMA (-1, 0, "Cima"),
+    BAIXO (1, 0, "Baixo"),
+    ESQUERDA (0, -1, "Esquerda"),
+    DIREITA (0, 1, "Direita");
 
     private final int deltaX;
     private final int deltaY;
