@@ -156,6 +156,34 @@ public class Jogo {
         finalizarAcao();
     }
 
+    /** Indica se o jogador da vez ainda tem alguma jogada legal neste turno. */
+    public boolean temAcaoDisponivel() {
+        if (terminou()) {
+            return false;
+        }
+        Setor setor = tabuleiro.getSetor(jogadorAtual.getPosicao());
+        boolean podeAgir = ciclo > 0 || movimentou;
+        boolean podeMover = acoes == 0 && !movimentou
+            && !setor.temInimigosVivos() && !setor.getPortas().isEmpty();
+        boolean podeAtacar = podeAgir && setor.temInimigosVivos();
+        boolean podeProcurar = podeAgir && setor.permiteProcura();
+        boolean podeCurar = podeAgir && jogadorAtual instanceof JogadorSuporte;
+        return podeMover || podeAtacar || podeProcurar || podeCurar;
+    }
+
+    /** Passa o que resta do turno quando o jogador não tem nenhuma jogada legal (evita travar o jogo). */
+    public void passarTurno() {
+        validarTurno(jogadorAtual);
+        if (temAcaoDisponivel()) {
+            throw new IllegalStateException("O jogador ainda tem jogadas disponíveis");
+        }
+        Jogador anterior = jogadorAtual;
+        int cicloAnterior = ciclo;
+        while (!terminou() && jogadorAtual == anterior && ciclo == cicloAnterior) {
+            finalizarAcao();
+        }
+    }
+
     private void validarAcao(Jogador jogador, TipoAcao tipoAcao) {
         validarTurno(jogador);
         if (ciclo == 0 && !movimentou) {

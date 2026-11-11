@@ -15,11 +15,17 @@ public class Main {
 
     public static void main(String[] args) {
         Jogo jogo = new Jogo();
-        System.out.println("=== Jogo de Tabuleiro ===");
+        System.out.println(Cores.colorir(Cores.ANSI_CYAN, "=== Jogo de Tabuleiro ==="));
         System.out.println("Encontre a fonte em até 25 ciclos. Os jogadores começam no centro [3, 3].");
 
         while (!jogo.terminou()) {
             mostrarEstado(jogo);
+            if (!jogo.temAcaoDisponivel()) {
+                System.out.println(Cores.colorir(Cores.ANSI_YELLOW,
+                    "Nenhuma jogada possível para " + jogo.getJogadorAtual().getNome() + ": o turno passa."));
+                jogo.passarTurno();
+                continue;
+            }
             Jogador jogador = jogo.getJogadorAtual();
             Setor setor = jogo.getTabuleiro().getSetor(jogador.getPosicao());
 
@@ -48,7 +54,7 @@ public class Main {
                     return;
                 }
             } catch (IllegalStateException | IllegalArgumentException e) {
-                System.out.println(">> Jogada inválida: " + e.getMessage());
+                System.out.println(Cores.colorir(Cores.ANSI_RED, ">> Jogada inválida: " + e.getMessage()));
             }
         }
 
@@ -61,7 +67,7 @@ public class Main {
 
         System.out.println();
         System.out.println("----------------------------------------");
-        System.out.println("Ciclo " + jogo.getCiclo() + " | Vez de: " + jogador.getNome());
+        System.out.println(Cores.colorir(Cores.ANSI_YELLOW, "Ciclo " + jogo.getCiclo() + " | Vez de: " + jogador.getNome()));
         System.out.println("P1: " + jogo.getJogadorSimples().getAtkDef() + " em "
             + jogo.getJogadorSimples().getPosicao()
             + (jogo.getJogadorSimples().isVivo() ? "" : " (eliminado)"));
@@ -84,7 +90,7 @@ public class Main {
         } else {
             System.out.println("Inimigos:");
             for (Inimigo inimigo : inimigos) {
-                System.out.println("  - " + inimigo.getNome() + " (" + inimigo.getAtkDef() + ")");
+                System.out.println(Cores.colorir(Cores.ANSI_RED, "  - " + inimigo.getNome() + " (" + inimigo.getAtkDef() + ")"));
             }
         }
     }
@@ -111,7 +117,7 @@ public class Main {
         Setor novo = jogo.getTabuleiro().getSetor(jogador.getPosicao());
         System.out.println("Você entrou no setor " + jogador.getPosicao() + " (" + novo.getTipo() + ").");
         if (novo.temInimigosVivos()) {
-            System.out.println("Há inimigos neste setor!");
+            System.out.println(Cores.colorir(Cores.ANSI_RED, "Há inimigos neste setor!"));
         }
     }
 
@@ -128,7 +134,7 @@ public class Main {
         }
 
         boolean acertou = jogo.atacar(jogador, alvo);
-        System.out.println(acertou ? "O ataque acertou!" : "O ataque errou.");
+        System.out.println(acertou ? Cores.colorir(Cores.ANSI_GREEN, "O ataque acertou!") : Cores.colorir(Cores.ANSI_RED, "O ataque errou."));
     }
 
     private static void recuperar(Jogo jogo, JogadorSuporte suporte) {
@@ -138,7 +144,7 @@ public class Main {
         int escolha = escolher("Quem recupera defesa?", nomes);
         Jogador alvo = escolha == 0 ? jogo.getJogadorSimples() : jogo.getJogadorSuporte();
         jogo.recuperarDefesa(suporte, alvo);
-        System.out.println(alvo.getNome() + " recuperou defesa. Agora: " + alvo.getAtkDef());
+        System.out.println(Cores.colorir(Cores.ANSI_GREEN, alvo.getNome() + " recuperou defesa. Agora: " + alvo.getAtkDef()));
     }
 
     private static String descreverProcura(int dado) {
@@ -152,14 +158,14 @@ public class Main {
 
     private static void mostrarResultado(Jogo jogo) {
         System.out.println();
-        System.out.println("=== Fim de jogo ===");
+        System.out.println(Cores.colorir(Cores.ANSI_CYAN, "=== Fim de jogo ==="));
         Jogador vencedor = jogo.getVencedor();
         if (vencedor != null) {
-            System.out.println(vencedor.getNome() + " encontrou a fonte e venceu!");
+            System.out.println(Cores.colorir(Cores.ANSI_GREEN, vencedor.getNome() + " encontrou a fonte e venceu!"));
         } else if (!jogo.getJogadorSimples().isVivo() && !jogo.getJogadorSuporte().isVivo()) {
-            System.out.println("Os dois jogadores foram eliminados. Derrota.");
+            System.out.println(Cores.colorir(Cores.ANSI_RED, "Os dois jogadores foram eliminados. Derrota."));
         } else {
-            System.out.println("O limite de ciclos foi atingido. Derrota.");
+            System.out.println(Cores.colorir(Cores.ANSI_RED, "O limite de ciclos foi atingido. Derrota."));
         }
         System.out.println("A fonte estava em " + jogo.getTabuleiro().getFonte() + ".");
     }
